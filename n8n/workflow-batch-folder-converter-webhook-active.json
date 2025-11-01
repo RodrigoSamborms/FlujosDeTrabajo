@@ -1,0 +1,77 @@
+{
+  "name": "Batch Folder Converter (soffice) - Webhook (active)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "batch-convert",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 150]
+    },
+    {
+      "parameters": {
+        "command": "bash",
+        "arguments": [
+          "-lc",
+          "/home/rodrigo/GitHub/FlujosDeTrabajo/scripts/n8n_invoke_probe.sh /home/rodrigo/GitHub/FlujosDeTrabajo/logs /home/rodrigo/GitHub/FlujosDeTrabajo/.convert_lock 300"
+        ],
+        "options": {}
+      },
+      "name": "Execute Batch Convert",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [500, 150]
+    },
+    {
+      "parameters": {
+        "values": {
+          "boolean": [],
+          "number": [],
+          "string": [
+            {
+              "name": "status",
+              "value": "={{ $json[\"stdout\"] || \"started\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Status",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [750, 150]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute Batch Convert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Batch Convert": {
+      "main": [
+        [
+          {
+            "node": "Set Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": null
+}
